@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MissigNo - Agência Digital | Desenvolvimento Web, SEO e Marketing</title>
+
+  <!-- SEO Meta Tags Essenciais -->
+  <meta name="description" content="Agência digital MissigNo, especializada em desbloquear o potencial digital de marcas através de desenvolvimento web, SEO, e marketing digital. Criamos experiências que conectam, engajam e convertem." />
+  <meta name="keywords" content="agência digital, desenvolvimento web, seo, marketing digital, criação de sites, performance, design responsivo" />
+  <meta name="author" content="MissigNo" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://agenciamissigno.com.br/" /> <!-- Substitua pela sua URL final -->
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://agenciamissigno.com.br/" /> <!-- Substitua pela sua URL final -->
+  <meta property="og:title" content="MissigNo - Agência Digital | Desenvolvimento Web, SEO e Marketing" />
+  <meta property="og:description" content="Desbloqueie o potencial digital da sua marca. Criamos experiências que conectam, engajam e convertem." />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop" /> <!-- URL de uma imagem representativa -->
+  <meta property="og:site_name" content="MissigNo" />
+  <meta property="og:locale" content="pt_BR" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://agenciamissigno.com.br/" /> <!-- Substitua pela sua URL final -->
+  <meta property="twitter:title" content="MissigNo - Agência Digital | Desenvolvimento Web, SEO e Marketing" />
+  <meta property="twitter:description" content="Desbloqueie o potencial digital da sua marca. Criamos experiências que conectam, engajam e convertem." />
+  <meta property="twitter:image" content="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop" /> <!-- URL da mesma imagem representativa -->
+  
+  <!-- UI/UX e Favicons -->
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+  <link id="favicon-ico" rel="icon" href="/favicon.ico" sizes="any" />
+  <link id="favicon-svg" rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link id="apple-touch-icon" rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+
+  <!-- Tailwind via CDN (com config inline) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#0f172a',
+            'secondary': '#1e293b',
+            'accent': '#0891b2',
+            'accent-hover': '#06b6d4',
+            'light': '#f8fafc',
+            'muted': '#94a3b8',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          animation: {
+            'gradient-bg': 'gradient-bg 15s ease infinite',
+            'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
+            'aurora': 'aurora 20s ease-in-out infinite',
+          },
+          keyframes: {
+            'gradient-bg': {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            'fade-in-up': {
+              '0%': { opacity: '0', transform: 'translateY(20px) scale(0.98)' },
+              '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+            },
+            'aurora': {
+              '0%': { backgroundPosition: '50% 0%' },
+              '50%': { backgroundPosition: '50% 100%' },
+              '100%': { backgroundPosition: '50% 0%' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/index.css">
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+  }
+}
+</script>
+
+<!-- Dados Estruturados - JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "MissigNo - Agência Digital",
+  "url": "https://agenciamissigno.com.br/",
+  "logo": "https://agenciamissigno.com.br/logo.png",
+  "description": "Agência digital especializada em desbloquear o potencial digital de marcas através de desenvolvimento web, SEO, e marketing digital.",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "contato@agenciamissigno.com.br"
+  },
+  "sameAs": [
+  ]
+}
+</script>
+
+</head>
+<body class="font-sans transition-colors duration-300">
+  <div id="root"></div>
+  <!-- Vite/Parcel/etc. -->
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
