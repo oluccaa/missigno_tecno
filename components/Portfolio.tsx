@@ -99,7 +99,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ items }) => {
         <>
             <section id="portfolio" className="py-20 sm:py-28 bg-slate-50 dark:bg-primary">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-12" data-aos="fade-up">
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-light">
                             Projetos que <span className="text-accent">Falam por Si</span>
                         </h2>
@@ -109,7 +109,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ items }) => {
                     </div>
 
                     {/* Filter Buttons */}
-                    <div className="flex justify-center flex-wrap gap-2 md:gap-4 mb-12">
+                    <div className="flex justify-center flex-wrap gap-2 md:gap-4 mb-12" data-aos="fade-up" data-aos-delay="100">
                         {categories.map(category => (
                             <button
                                 key={category}
@@ -128,7 +128,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ items }) => {
                     {/* Portfolio Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredItems.map((item, index) => (
-                            <div key={item.id || index} className="animate-fade-in-up" style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards', opacity: 0 }}>
+                            <div key={item.id || index} data-aos="fade-up" data-aos-delay={index > 5 ? '0' : (index * 100)}>
                                 <PortfolioItem {...item} onClick={() => openModal(item)} />
                             </div>
                         ))}

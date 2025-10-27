@@ -36,6 +36,17 @@
   <link id="apple-touch-icon" rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
 
+  <style id="theme-colors">
+    :root {
+      /* Valores HSL: H S L */
+      --color-primary-hsl: 222 47% 11%;
+      --color-secondary-hsl: 215 28% 17%;
+      --color-accent-hsl: 194 91% 37%;
+      --color-accent-hover-hsl: 187 94% 43%;
+      --color-light-hsl: 210 40% 98%;
+      --color-muted-hsl: 212 16% 65%;
+    }
+  </style>
 
   <!-- Tailwind via CDN (com config inline) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -45,12 +56,12 @@
       theme: {
         extend: {
           colors: {
-            'primary': '#0f172a',
-            'secondary': '#1e293b',
-            'accent': '#0891b2',
-            'accent-hover': '#06b6d4',
-            'light': '#f8fafc',
-            'muted': '#94a3b8',
+            'primary': 'hsl(var(--color-primary-hsl) / <alpha-value>)',
+            'secondary': 'hsl(var(--color-secondary-hsl) / <alpha-value>)',
+            'accent': 'hsl(var(--color-accent-hsl) / <alpha-value>)',
+            'accent-hover': 'hsl(var(--color-accent-hover-hsl) / <alpha-value>)',
+            'light': 'hsl(var(--color-light-hsl) / <alpha-value>)',
+            'muted': 'hsl(var(--color-muted-hsl) / <alpha-value>)',
           },
           fontFamily: { sans: ['Inter', 'sans-serif'] },
           animation: {
@@ -82,6 +93,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/index.css">
+  
 <script type="importmap">
 {
   "imports": {

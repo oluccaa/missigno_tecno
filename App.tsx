@@ -16,6 +16,34 @@ import BackToTopButton from './components/BackToTopButton';
 import WhatsAppButton from './components/WhatsAppButton';
 import SkeletonLoader from './components/SkeletonLoader'; // Importando o Skeleton Loader
 
+// ==========================
+// Color Conversion Utilities
+// ==========================
+const hexToRgb = (hex: string): [number, number, number] | null => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
+};
+
+const rgbToHsl = (r: number, g: number, b: number): [number, number, number] => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s, l = (max + min) / 2;
+    if (max === min) {
+        h = s = 0;
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+};
+
+
 // Define types for content
 interface Technology {
   name: string;
@@ -32,6 +60,15 @@ interface PortfolioItem {
   solucao?: string;
   resultados?: string;
   position?: number;
+}
+
+interface ThemeSettings {
+    primary: string;
+    secondary: string;
+    accent: string;
+    accentHover: string;
+    light: string;
+    muted: string;
 }
 
 interface WebsiteContent {
@@ -55,6 +92,7 @@ interface WebsiteContent {
       faviconSvgUrl: string;
       appleTouchIconUrl: string;
   };
+  theme_settings: ThemeSettings;
 }
 
 // Default content in case of fetch error or for initial render
@@ -110,6 +148,14 @@ const defaultContent: WebsiteContent = {
         faviconIcoUrl: "",
         faviconSvgUrl: "",
         appleTouchIconUrl: ""
+    },
+    theme_settings: {
+        primary: '#0f172a',
+        secondary: '#1e293b',
+        accent: '#0891b2',
+        accentHover: '#06b6d4',
+        light: '#f8fafc',
+        muted: '#94a3b8',
     }
 };
 
@@ -118,211 +164,170 @@ const supabaseUrl = 'https://vvonilfxdxzgydrqjser.supabase.co';
 const supabaseKey = 'sb_publishable_PT_t-om6yeIs-MFPa9mDqA_SlrDWviy';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Helper function to determine the initial theme based on user preference and system settings.
+const getInitialTheme = (): 'light' | 'dark' => {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return 'light';
+  }
+  const storedTheme = window.localStorage.getItem('theme');
+  if (storedTheme === 'dark' || storedTheme === 'light') {
+    return storedTheme;
+  }
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+  return 'light';
+};
 
 const App: React.FC = () => {
-    // Theme state
-    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            const storedTheme = window.localStorage.getItem('theme');
-            if (storedTheme === 'dark' || storedTheme === 'light') {
-                return storedTheme;
-            }
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                return 'dark';
-            }
+    const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
+    const [session, setSession] = useState<Session | null>(null);
+    const [content, setContent] = useState<WebsiteContent | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [hash, setHash] = useState(window.location.hash);
+
+    const fetchContent = useCallback(async () => {
+        setLoading(true);
+        try {
+            // Fetch sections
+            const { data: sectionsData, error: sectionsError } = await supabase
+                .from('sections')
+                .select('id, content');
+            
+            if (sectionsError) throw sectionsError;
+
+            // Fetch portfolio items ordered by position
+            const { data: portfolioData, error: portfolioError } = await supabase
+                .from('portfolio')
+                .select('*')
+                .order('position', { ascending: true });
+
+            if (portfolioError) throw portfolioError;
+            
+            const fetchedContent: Partial<WebsiteContent> = {};
+
+            sectionsData.forEach(section => {
+              if (section.id && section.content) {
+                  (fetchedContent as any)[section.id] = section.content;
+              }
+            });
+            
+            fetchedContent.portfolio = portfolioData || defaultContent.portfolio;
+            
+            // Merge with default to ensure all keys are present
+            const finalContent = {
+                header: { ...defaultContent.header, ...fetchedContent.header },
+                about: { ...defaultContent.about, ...fetchedContent.about },
+                portfolio: fetchedContent.portfolio.length > 0 ? fetchedContent.portfolio : defaultContent.portfolio,
+                site_meta: { ...defaultContent.site_meta, ...fetchedContent.site_meta },
+                theme_settings: { ...defaultContent.theme_settings, ...fetchedContent.theme_settings },
+            };
+
+            setContent(finalContent as WebsiteContent);
+        } catch (error: any) {
+            console.error("Error fetching content:", error.message);
+            setContent(defaultContent);
+        } finally {
+            setLoading(false);
         }
-        return 'light';
-    });
+    }, []);
+
+    useEffect(() => {
+        fetchContent();
+    }, [fetchContent]);
+
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+            // If user logs out, redirect to home
+            if (_event === 'SIGNED_OUT') {
+                window.location.hash = '';
+            }
+        });
+        
+        // Initial session check
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session)
+        });
+
+        const handleHashChange = () => setHash(window.location.hash);
+        window.addEventListener('hashchange', handleHashChange);
+
+        return () => {
+            subscription.unsubscribe();
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+    
+    // Apply theme colors from DB
+    useEffect(() => {
+        if (content?.theme_settings) {
+            const settings = content.theme_settings;
+            const root = document.documentElement;
+            
+            const applyColor = (cssVar: string, hex: string) => {
+                const rgb = hexToRgb(hex);
+                if (rgb) {
+                    const [h, s, l] = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+                    root.style.setProperty(cssVar, `${h} ${s}% ${l}%`);
+                }
+            };
+            
+            applyColor('--color-primary-hsl', settings.primary);
+            applyColor('--color-secondary-hsl', settings.secondary);
+            applyColor('--color-accent-hsl', settings.accent);
+            applyColor('--color-accent-hover-hsl', settings.accentHover);
+            applyColor('--color-light-hsl', settings.light);
+            applyColor('--color-muted-hsl', settings.muted);
+        }
+    }, [content?.theme_settings]);
+
+    // Update Favicons
+    useEffect(() => {
+        if (content?.site_meta) {
+            const { faviconIcoUrl, faviconSvgUrl, appleTouchIconUrl } = content.site_meta;
+            (document.getElementById('favicon-ico') as HTMLLinkElement).href = faviconIcoUrl || '/favicon.ico';
+            (document.getElementById('favicon-svg') as HTMLLinkElement).href = faviconSvgUrl || '/favicon.svg';
+            (document.getElementById('apple-touch-icon') as HTMLLinkElement).href = appleTouchIconUrl || '/apple-touch-icon.png';
+        }
+    }, [content?.site_meta]);
 
     const toggleTheme = () => {
         setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
     };
 
-    useEffect(() => {
-        const root = window.document.documentElement;
-        root.classList.remove(theme === 'light' ? 'dark' : 'light');
-        root.classList.add(theme);
-        localStorage.setItem('theme', theme);
-
-        // Update meta theme-color for mobile browser UI
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        if (themeColorMeta) {
-            const color = theme === 'dark' ? '#0f172a' : '#f8fafc';
-            // We need to update both in case the user's system preference changes
-            const lightMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: light)"]');
-            const darkMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]');
-            if(lightMeta) lightMeta.setAttribute('content', '#f8fafc');
-            if(darkMeta) darkMeta.setAttribute('content', '#0f172a');
-        }
-
-    }, [theme]);
-    
-    // Routing, Auth, and Content state
-    const [hash, setHash] = useState(window.location.hash);
-    const [session, setSession] = useState<Session | null>(null);
-    const [content, setContent] = useState<WebsiteContent>(defaultContent);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    // Dynamic Favicon Update Effect
-    useEffect(() => {
-        if (content.site_meta) {
-            const { faviconIcoUrl, faviconSvgUrl, appleTouchIconUrl } = content.site_meta;
-            
-            const setLinkHref = (id: string, href: string) => {
-                const linkElement = document.getElementById(id) as HTMLLinkElement | null;
-                if (linkElement && href) {
-                    linkElement.href = href;
-                }
-            };
-            
-            setLinkHref('favicon-ico', faviconIcoUrl);
-            setLinkHref('favicon-svg', faviconSvgUrl);
-            setLinkHref('apple-touch-icon', appleTouchIconUrl);
-        }
-    }, [content.site_meta]);
-
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const { data: sectionsData, error: sectionsError } = await supabase.from('sections').select('id, content');
-            if (sectionsError) throw sectionsError;
-
-            const { data: portfolioData, error: portfolioError } = await supabase
-                .from('portfolio')
-                .select('*')
-                .order('position', { ascending: true, nullsFirst: true })
-                .order('created_at', { ascending: true });
-
-            if (portfolioError) throw portfolioError;
-
-            const sanitizedPortfolio = (portfolioData || []).map(item => {
-                let techs = item.technologies;
-                if (typeof techs === 'string') {
-                    try {
-                        techs = JSON.parse(techs);
-                    } catch (e) {
-                        console.warn(`Failed to parse technologies for item ${item.id}:`, techs);
-                        techs = [];
-                    }
-                }
-                if (!Array.isArray(techs)) {
-                    techs = [];
-                }
-                return { ...item, technologies: techs };
-            });
-
-            const dbHeaderContent = sectionsData.find(s => s.id === 'header')?.content;
-            const headerContent = {
-                ...defaultContent.header,
-                ...dbHeaderContent,
-            };
-
-            const aboutContent = sectionsData.find(s => s.id === 'about')?.content || defaultContent.about;
-            const siteMetaContent = sectionsData.find(s => s.id === 'site_meta')?.content || defaultContent.site_meta;
-
-            setContent({
-                header: headerContent,
-                about: aboutContent,
-                portfolio: sanitizedPortfolio.length > 0 ? sanitizedPortfolio : defaultContent.portfolio,
-                site_meta: siteMetaContent,
-            });
-        } catch (err: any) {
-            console.error("--- Erro Detalhado ao Buscar Conteúdo do Supabase ---");
-            console.error("Objeto de erro recebido:", err);
-
-            let userFriendlyError: string;
-
-            if (err?.code === '42703' && err?.message?.includes('column "position" does not exist')) {
-                userFriendlyError = "Erro de Configuração: A coluna 'position' para ordenar o portfólio não foi encontrada.\n\n" +
-                                  "Acesse seu painel do Supabase, vá para a tabela 'portfolio' e adicione uma nova coluna chamada 'position' com o tipo 'int4' (Integer).";
-            } else {
-                let detailedMessage = "Ocorreu um erro inesperado.";
-                if (err && typeof err === 'object' && err.message) {
-                    detailedMessage = err.message;
-                    if (err.details) detailedMessage += ` | Detalhes: ${err.details}`;
-                    if (err.hint) detailedMessage += ` | Dica: ${err.hint}`;
-                    if (err.code) detailedMessage += ` | Código: ${err.code}`;
-                } else if (err) {
-                    try {
-                        detailedMessage = `Objeto de erro não padrão: ${JSON.stringify(err)}`;
-                    } catch (e) {
-                        detailedMessage = "Ocorreu um erro de busca que não pôde ser serializado. Verifique o console.";
-                    }
-                }
-                
-                userFriendlyError = `Não foi possível carregar o conteúdo do site. Detalhes: ${detailedMessage}\n\nVerifique se as políticas de RLS (Row Level Security) para as tabelas 'sections' e 'portfolio' estão habilitadas para leitura pública.`;
-            }
-            
-            setError(userFriendlyError);
-        }
-        setLoading(false);
-    }, []);
-
-
-    useEffect(() => {
-        const handleHashChange = () => {
-            setHash(window.location.hash);
-        };
-        window.addEventListener('hashchange', handleHashChange);
-
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-        });
-
-        fetchData();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            if (_event === 'SIGNED_IN' && window.location.hash !== '#admin') {
-                window.location.hash = '#admin';
-            }
-            if (_event === 'SIGNED_OUT' && window.location.hash.startsWith('#admin')) {
-                window.location.hash = '';
-            }
-        });
-
-        return () => {
-            window.removeEventListener('hashchange', handleHashChange);
-            subscription?.unsubscribe();
-        };
-    }, [fetchData]);
-
-    // Render logic
-    if (hash === '#login') {
-        return <Login theme={theme} toggleTheme={toggleTheme} supabase={supabase} />;
-    }
-
-    if (hash === '#admin') {
-        if (!session) {
-            window.location.hash = '#login';
-            return null; // Redirecting
-        }
-        if (loading) {
-            return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-primary text-slate-900 dark:text-light">Loading Admin...</div>;
-        }
-        return <AdminDashboard theme={theme} toggleTheme={toggleTheme} supabase={supabase} initialContent={content} onSaveSuccess={fetchData} />;
-    }
-    
-    if (loading) {
+    if (loading || !content) {
         return <SkeletonLoader />;
     }
-    
-    if (error) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 p-8 text-center">
-                <div className="bg-white dark:bg-secondary p-8 rounded-lg shadow-lg border border-red-200 dark:border-red-800">
-                    <h1 className="text-2xl font-bold mb-4 text-red-800 dark:text-red-200">Erro de Conexão</h1>
-                    <p className="max-w-2xl whitespace-pre-wrap">{error}</p>
-                    <p className="mt-4 text-sm text-slate-500 dark:text-muted">Isso geralmente acontece quando o acesso de leitura não foi habilitado nas tabelas do Supabase ou uma coluna está faltando.</p>
-                </div>
-            </div>
-        );
+
+    if (hash === '#login' && !session) {
+      return <Login theme={theme} toggleTheme={toggleTheme} supabase={supabase} />;
     }
 
+    if (session && (hash === '#admin' || hash === '')) {
+      return (
+        <AdminDashboard
+          theme={theme}
+          toggleTheme={toggleTheme}
+          supabase={supabase}
+          initialContent={content}
+          onSaveSuccess={fetchContent}
+          session={session}
+        />
+      );
+    }
+    
     return (
-        <div className="bg-white dark:bg-primary text-slate-800 dark:text-light transition-colors duration-300">
+        <div id="inicio" className="bg-white dark:bg-primary transition-colors duration-300">
             <Header theme={theme} toggleTheme={toggleTheme} content={content.header} />
             <main>
                 <Hero />
@@ -333,7 +338,7 @@ const App: React.FC = () => {
                 <Contact />
             </main>
             <Footer />
-            <div className="fixed bottom-8 right-8 flex flex-col items-center gap-4 z-40">
+            <div className="fixed bottom-6 right-6 flex flex-col items-center gap-4 z-40">
                 <WhatsAppButton />
                 <BackToTopButton />
             </div>

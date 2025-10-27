@@ -1,8 +1,8 @@
 import React from 'react';
 
-const ProcessStep: React.FC<{ number: string; title: string; description: string; }> = ({ number, title, description }) => {
+const ProcessStep: React.FC<{ number: string; title: string; description: string; delay: number }> = ({ number, title, description, delay }) => {
     return (
-        <div className="relative pl-12 pb-12 border-l border-slate-300 dark:border-slate-700 last:border-l-transparent last:pb-0">
+        <div data-aos="fade-up" data-aos-delay={delay} className="relative pl-12 pb-12 border-l border-slate-300 dark:border-slate-700 last:border-l-transparent last:pb-0">
             <div className="absolute -left-5 top-0 flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-secondary border-2 border-slate-300 dark:border-slate-700 text-accent font-bold">
                 {number}
             </div>
@@ -24,7 +24,7 @@ const Process: React.FC = () => {
     return (
         <section id="processo" className="py-20 sm:py-28 bg-white dark:bg-secondary">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
+                <div className="text-center mb-16" data-aos="fade-up">
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-light">
                         Nosso Caminho para o <span className="text-accent">Sucesso</span>
                     </h2>
@@ -34,7 +34,7 @@ const Process: React.FC = () => {
                 </div>
                 <div className="max-w-2xl mx-auto">
                     {processData.map((step, index) => (
-                         <ProcessStep key={index} {...step} />
+                         <ProcessStep key={index} {...step} delay={index * 150} />
                     ))}
                 </div>
             </div>

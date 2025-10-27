@@ -39,17 +39,17 @@ const Services: React.FC = () => {
     return (
         <section id="solucoes" className="py-20 sm:py-28 bg-slate-50 dark:bg-primary overflow-hidden">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-light animate-fade-in-up" style={{ opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="text-center mb-12" data-aos="fade-up">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-light">
                         Nossas Soluções para <span className="text-accent">Impulsionar</span> seu Negócio
                     </h2>
-                    <p className="mt-4 text-lg text-slate-500 dark:text-muted max-w-2xl mx-auto animate-fade-in-up" style={{ opacity: 0, animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+                    <p className="mt-4 text-lg text-slate-500 dark:text-muted max-w-2xl mx-auto">
                         Oferecemos um leque completo de serviços para garantir a presença digital de sua empresa.
                     </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {servicesData.map((service, index) => (
-                        <div key={index} className="animate-fade-in-up" style={{ animationDelay: `${0.4 + index * 0.1}s`, animationFillMode: 'forwards', opacity: 0 }}>
+                        <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
                             <ServiceCard icon={service.icon} title={service.title} description={service.description} />
                         </div>
                     ))}

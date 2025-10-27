@@ -27,13 +27,13 @@ const Hero: React.FC = () => {
 
             {/* Layer 4: Content */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 dark:text-light tracking-tighter mb-4 animate-fade-in-up" style={{ animationFillMode: 'forwards' }}>
+                <h1 data-aos="fade-up" className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 dark:text-light tracking-tighter mb-4">
                     Desbloqueie o Potencial <br className="hidden md:block" /> Digital da Sua Marca<span className="text-accent">.</span>
                 </h1>
-                <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-500 dark:text-muted mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'forwards', opacity: 0 }}>
+                <p data-aos="fade-up" data-aos-delay="200" className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-500 dark:text-muted mb-8">
                     Criamos experiências digitais autênticas que conectam, engajam e convertem. Da ideia ao lançamento, somos o parceiro que sua empresa precisa para decolar no mundo online.
                 </p>
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.4s', animationFillMode: 'forwards', opacity: 0 }}>
+                <div data-aos="fade-up" data-aos-delay="400">
                     <a href="#contato" onClick={handleCTAClick} className="inline-block bg-accent hover:bg-accent-hover text-white font-bold text-lg py-4 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/20">
                         Vamos Conversar
                     </a>
