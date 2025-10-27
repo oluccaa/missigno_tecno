@@ -337,7 +337,7 @@ const App: React.FC = () => {
                 <Process />
                 <Contact />
             </main>
-            <Footer />
+            <Footer theme={theme} content={content.header} />
             <div className="fixed bottom-6 right-6 flex flex-col items-center gap-4 z-40">
                 <WhatsAppButton />
                 <BackToTopButton />
