@@ -31,9 +31,10 @@ interface Profile {
   id: string;
   full_name: string | null;
   phone: string | null;
+  avatar: string | null;
 }
 
-type AdminTab = 'header' | 'about' | 'portfolio' | 'appearance' | 'config' | 'profile' | 'history' | 'home';
+type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
 
 
 interface AdminHomeProps {

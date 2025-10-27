@@ -6,6 +6,7 @@ import AdminSidebar from './AdminSidebar';
 import AdminAppearance from './AdminAppearance';
 import AdminHeader from './AdminHeader';
 import AdminPortfolio from './AdminPortfolio'; // Importando o novo componente
+import AdminProfile from './AdminProfile'; // Importando a nova tela de perfil
 import AdminSaveBar from './AdminSaveBar';
 import ImagePreview from './ImagePreview';
 
@@ -71,6 +72,7 @@ interface Profile {
   id: string;
   full_name: string | null;
   phone: string | null;
+  avatar: string | null;
 }
 
 interface AuditLog {
@@ -92,7 +94,7 @@ interface AdminDashboardProps {
   session: Session | null;
 }
 
-type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'config' | 'profile' | 'history';
+type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
 
 type ErrorMap = { [key: string]: string };
 
@@ -175,7 +177,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const fetchProfileAndLogs = useCallback(async () => {
         if (!session?.user.id) return;
         try {
-            const { data: profileData, error: profileError } = await supabase.from('profiles').select('id, full_name, phone').eq('id', session.user.id).single();
+            const { data: profileData, error: profileError } = await supabase.from('profiles').select('id, full_name, phone, avatar').eq('id', session.user.id).maybeSingle();
             if (profileError) throw profileError;
             setProfile(profileData);
 
@@ -405,9 +407,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 );
             case 'portfolio': return <AdminPortfolio portfolio={content.portfolio} portfolioErrors={errors.portfolio} uploading={uploading} saveBarProps={saveBarProps} handlePortfolioChange={handlePortfolioChange} handlePortfolioTechChange={handlePortfolioTechChange} addPortfolioItem={addPortfolioItem} addPortfolioTech={addPortfolioTech} removePortfolioTech={removePortfolioTech} handleDeletePortfolioItem={handleDeletePortfolioItem} handleMoveItemUp={(i) => handleMoveItem(i, 'up')} handleMoveItemDown={(i) => handleMoveItem(i, 'down')} triggerFileUpload={triggerFileUpload} handleTechIconUpload={handleTechIconUpload} handleImageUpload={handleImageUpload} handleBlur={() => {}} />;
             case 'appearance': return <AdminAppearance themeSettings={content.theme_settings} siteMeta={content.site_meta} setContent={setContent} setMessage={setMessage} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
-            case 'config':
             case 'profile':
-                 return <div className={cardStyle}><h3 className="text-xl font-bold">Em Construção</h3><p className="text-slate-500 dark:text-muted mt-2">Esta seção estará disponível em breve.</p></div>;
+                 return <AdminProfile session={session} profile={profile} supabase={supabase} onUpdate={fetchProfileAndLogs} />;
             case 'history':
                 const timeAgo = (dateString: string): string => {
                     const date = new Date(dateString);
@@ -448,7 +449,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     
     return (
         <div className="flex min-h-screen bg-slate-100 dark:bg-primary text-slate-900 dark:text-light">
-            <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} session={session} handleLogout={handleLogout} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+            <AdminSidebar 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+              session={session}
+              profile={profile}
+              handleLogout={handleLogout} 
+              isOpen={isSidebarOpen} 
+              setIsOpen={setIsSidebarOpen} 
+            />
             <div className="flex-1 flex flex-col md:ml-64">
                 <header className="md:hidden flex items-center justify-between h-20 px-4 bg-white dark:bg-secondary border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30">
                      <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-slate-600 dark:text-slate-300">

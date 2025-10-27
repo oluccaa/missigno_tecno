@@ -192,27 +192,31 @@ const AdminAppearance: React.FC<AdminAppearanceProps> = ({
     return (
         <div className="space-y-8">
             <AdminSaveBar {...saveBarProps} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className={`${cardStyle} self-start`}>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-light mb-2">Gerador de Paleta</h3>
-                    <p className="text-sm text-slate-500 dark:text-muted mb-4">
-                        Insira uma cor base para gerar uma paleta de cores harmoniosa e de alto contraste.
-                    </p>
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="base-color-input" className={labelStyle}>Cor Base</label>
-                            <div className="flex items-center gap-2">
-                                <input id="base-color-picker" type="color" value={baseColor} onChange={e => setBaseColor(e.target.value)} className="p-1 h-12 w-12 block bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer rounded-lg" aria-label="Selecionar cor base" />
-                                <input id="base-color-input" type="text" value={baseColor} onChange={e => setBaseColor(e.target.value)} className={inputStyle} placeholder="#0891b2" />
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
+                <div className={`${cardStyle} lg:col-span-3 flex flex-col`}>
+                    <div>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-light mb-2">Gerador de Paleta</h3>
+                        <p className="text-sm text-slate-500 dark:text-muted mb-4">
+                            Insira uma cor base para gerar uma paleta de cores harmoniosa e de alto contraste.
+                        </p>
+                        <div className="space-y-4">
+                            <div>
+                                <label htmlFor="base-color-input" className={labelStyle}>Cor Base</label>
+                                <div className="flex items-center gap-2">
+                                    <input id="base-color-picker" type="color" value={baseColor} onChange={e => setBaseColor(e.target.value)} className="p-1 h-12 w-12 block bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 cursor-pointer rounded-lg" aria-label="Selecionar cor base" />
+                                    <input id="base-color-input" type="text" value={baseColor} onChange={e => setBaseColor(e.target.value)} className={inputStyle} placeholder="#0891b2" />
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <div className="mt-auto pt-4">
                         <button onClick={generatePalette} className="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                             Gerar Paleta
                         </button>
                     </div>
                 </div>
 
-                <div className={`${cardStyle} self-start`}>
+                <div className={`${cardStyle} lg:col-span-7`}>
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                         <h3 className="text-xl font-bold text-slate-900 dark:text-light">Paleta de Cores Manual</h3>
                         <button onClick={handleResetColors} className="text-sm font-semibold text-slate-500 hover:text-accent dark:hover:text-accent-hover transition-colors px-3 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 flex-shrink-0">

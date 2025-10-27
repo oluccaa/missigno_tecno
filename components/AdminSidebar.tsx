@@ -1,12 +1,20 @@
 import React from 'react';
 import type { Session } from '@supabase/supabase-js';
 
-type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'config' | 'profile' | 'history';
+type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
+
+interface Profile {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  avatar: string | null;
+}
 
 interface AdminSidebarProps {
   activeTab: AdminTab;
   setActiveTab: (tab: AdminTab) => void;
   session: Session | null;
+  profile: Profile | null;
   handleLogout: () => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -37,7 +45,7 @@ const NavLink: React.FC<{
   );
 };
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, setActiveTab, session, handleLogout, isOpen, setIsOpen }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, setActiveTab, session, profile, handleLogout, isOpen, setIsOpen }) => {
   
   const handleNavClick = (tab: AdminTab) => {
     setActiveTab(tab);
@@ -97,7 +105,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, setActiveTab, se
           <div>
             <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sistema</h3>
             <div className="space-y-1">
-              <NavLink label="Configurações" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} isActive={activeTab === 'config'} onClick={() => handleNavClick('config')} />
               <NavLink label="Meu Perfil" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>} isActive={activeTab === 'profile'} onClick={() => handleNavClick('profile')} />
               <NavLink label="Histórico" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} isActive={activeTab === 'history'} onClick={() => handleNavClick('history')} />
             </div>
@@ -105,9 +112,18 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, setActiveTab, se
         </nav>
 
         <div className="mt-auto p-4 border-t border-slate-700">
-           <div className="flex flex-col text-center">
-             <span className="text-sm text-slate-300 font-medium truncate">{session?.user?.email}</span>
-             <button onClick={handleLogout} className="mt-2 text-sm text-slate-400 hover:text-red-400 transition-colors">Sair</button>
+           <div className="flex items-center gap-3">
+              {profile?.avatar ? (
+                  <img src={profile.avatar} alt="Avatar do usuário" className="h-10 w-10 rounded-full object-cover" />
+              ) : (
+                  <div className="h-10 w-10 rounded-full bg-slate-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
+                  </div>
+              )}
+               <div className="flex-1 overflow-hidden">
+                 <span className="text-sm text-slate-300 font-medium truncate block">{profile?.full_name || session?.user?.email}</span>
+                 <button onClick={handleLogout} className="text-xs text-slate-400 hover:text-red-400 transition-colors">Sair</button>
+               </div>
            </div>
         </div>
       </aside>
