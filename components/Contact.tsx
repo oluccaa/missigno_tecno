@@ -162,10 +162,15 @@ const Contact: React.FC = () => {
                         <div className="text-center">
                             <button
                                 type="submit"
-                                className="bg-accent hover:bg-accent-hover text-white font-bold text-lg py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-accent hover:bg-accent-hover text-white font-bold text-lg py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                                 disabled={status === 'Enviando...'}
                             >
-                                {status === 'Enviando...' ? 'Enviando...' : 'Enviar Mensagem'}
+                                <span>{status === 'Enviando...' ? 'Enviando...' : 'Enviar Mensagem'}</span>
+                                {status !== 'Enviando...' && (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                    </svg>
+                                )}
                             </button>
                         </div>
                     </form>

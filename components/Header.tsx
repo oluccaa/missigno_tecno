@@ -68,6 +68,7 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, content }) => {
     const navLinks = [
         { href: '#sobre', label: 'Sobre' },
         { href: '#solucoes', label: 'Soluções' },
+        { href: '#tecnologias', label: 'Tecnologias' },
         { href: '#portfolio', label: 'Portfolio' },
         { href: '#processo', label: 'Processo' },
     ];

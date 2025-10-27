@@ -34,7 +34,7 @@ interface Profile {
   avatar: string | null;
 }
 
-type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
+type AdminTab = 'home' | 'hero' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
 
 
 interface AdminHomeProps {
@@ -105,10 +105,10 @@ const AdminHome: React.FC<AdminHomeProps> = ({ setActiveTab, auditLogs, portfoli
     const recentActivity = auditLogs.slice(0, 5);
 
     const quickLinks = [
-        { label: 'Cabeçalho e Rodapé', tab: 'header' as AdminTab, icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg> },
+        { label: 'Hero', tab: 'hero' as AdminTab, icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3H3v6.75M21 14.25V21h-6.75M3 21l6.75-6.75M21 3l-6.75 6.75" /></svg> },
+        { label: 'Cabeçalho', tab: 'header' as AdminTab, icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg> },
         { label: 'Sobre', tab: 'about' as AdminTab, icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 16.5h-6a2.25 2.25 0 01-2.25-2.25V6a2.25 2.25 0 012.25-2.25h6m-3 0a2.25 2.25 0 002.25-2.25V3a2.25 2.25 0 00-2.25-2.25H9A2.25 2.25 0 006.75 3v.75c0 1.242 1.008 2.25 2.25 2.25h3zm-3 8.25h3.375a2.25 2.25 0 002.25-2.25V9m-3.375 0c1.242 0 2.25-1.008 2.25-2.25V6.75" /></svg> },
         { label: 'Portfólio', tab: 'portfolio' as AdminTab, icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z" /></svg> },
-        { label: 'Aparência', tab: 'appearance' as AdminTab, icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402a3.75 3.75 0 00-.615-5.898L8.188 4.097a3.75 3.75 0 00-5.304 0l-1.932 1.931a3.75 3.75 0 000 5.304l3.143 3.144z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.867 15.75c1.012-1.012 1.012-2.659 0-3.672l-1.543-1.543c-1.012-1.012-2.659-1.012-3.672 0l-1.543 1.543c-1.012 1.012-1.012 2.659 0 3.672l1.543 1.543c1.012 1.012 2.659 1.012 3.672 0z" /></svg> },
     ];
     
     return (

@@ -9,6 +9,9 @@ import AdminPortfolio from './AdminPortfolio'; // Importando o novo componente
 import AdminProfile from './AdminProfile'; // Importando a nova tela de perfil
 import AdminSaveBar from './AdminSaveBar';
 import ImagePreview from './ImagePreview';
+import AdminTechCarousel from './AdminTechCarousel';
+import AdminHero from './AdminHero';
+import AdminAbout from './AdminAbout';
 
 // ==========================
 // Tipos
@@ -48,18 +51,52 @@ interface HeaderContent {
   contactButton: string;
 }
 
+interface Value {
+  icon: string;
+  title: string;
+  text: string;
+}
+
+interface TeamMember {
+  imageUrl: string;
+  name: string;
+  role: string;
+}
+
 interface AboutContent {
     headline: string;
     paragraph1: string;
     paragraph2: string;
     buttonText: string;
     imageUrl: string;
+    philosophyHeadline: string;
+    philosophyText: string;
+    valuesHeadline: string;
+    values: Value[];
+    teamHeadline: string;
+    teamMembers: TeamMember[];
 }
+
+interface TechCarouselContent {
+    headline: string;
+    subheadline: string;
+    technologies: Technology[];
+}
+
+interface HeroContent {
+    headline: string;
+    paragraph: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+}
+
 
 interface WebsiteContent {
   header: HeaderContent;
+  hero: HeroContent;
   about: AboutContent;
   portfolio: PortfolioItem[];
+  tech_carousel: TechCarouselContent;
   site_meta: {
     faviconIcoUrl: string;
     faviconSvgUrl: string;
@@ -94,7 +131,7 @@ interface AdminDashboardProps {
   session: Session | null;
 }
 
-type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
+type AdminTab = 'home' | 'hero' | 'header' | 'about' | 'portfolio' | 'tecnologias' | 'appearance' | 'profile' | 'history';
 
 type ErrorMap = { [key: string]: string };
 
@@ -279,7 +316,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         }
     };
 
-    const handleTechIconUpload = async (event: React.ChangeEvent<HTMLInputElement>, itemIndex: number, techIndex: number) => {
+    const handleTechIconUpload = async (event: React.ChangeEvent<HTMLInputElement>, updateFunction: (svgContent: string) => void) => {
         if (!event.target.files || event.target.files.length === 0) return;
         const file = event.target.files[0];
         if (file.type !== 'image/svg+xml') {
@@ -289,7 +326,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         const reader = new FileReader();
         reader.onload = (e) => {
             const svgContent = e.target?.result as string;
-            handlePortfolioTechChange(itemIndex, techIndex, 'icon', svgContent);
+            updateFunction(svgContent);
         };
         reader.readAsText(file);
     };
@@ -306,8 +343,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         try {
             const updates = [];
             
-            // Sections update (header, about, site_meta, theme_settings)
-            const changedSections = (['header', 'about', 'site_meta', 'theme_settings'] as const)
+            // Sections update (header, about, site_meta, theme_settings, tech_carousel)
+            const changedSections = (['header', 'hero', 'about', 'tech_carousel', 'site_meta', 'theme_settings'] as const)
                 .filter(key => JSON.stringify(content[key]) !== JSON.stringify(originalContent[key]));
 
             for (const sectionId of changedSections) {
@@ -359,53 +396,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const renderContent = () => {
         const saveBarProps = { hasChanges, onSave: handleSave, onDiscard: handleDiscard, isSaving, message };
         const cardStyle = 'bg-white dark:bg-secondary p-6 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700';
-        const inputStyle = 'w-full bg-white dark:bg-slate-800 border rounded-lg px-4 py-3 text-slate-900 dark:text-light placeholder-slate-400 dark:placeholder-muted focus:outline-none focus:ring-2 transition-colors border-slate-300 dark:border-slate-700 focus:ring-accent';
-        const labelStyle = 'block text-sm font-medium text-slate-700 dark:text-muted mb-1';
-        const uploadButtonStyle = 'flex-shrink-0 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-wait whitespace-nowrap flex items-center gap-2';
         
         switch (activeTab) {
             case 'home': return <AdminHome setActiveTab={setActiveTab} auditLogs={auditLogs} portfolio={content.portfolio} profile={profile} />;
-            // Fix: Pass handleInputChange directly, as AdminHeader calls it with the correct arguments, preventing an argument count mismatch.
             case 'header': return <AdminHeader content={content.header} handleInputChange={handleInputChange} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} headerErrors={errors.header} handleBlur={() => {}} saveBarProps={saveBarProps} />;
-            case 'about':
-                return (
-                  <div>
-                    <AdminSaveBar {...saveBarProps} />
-                    <div className={`${cardStyle} space-y-6`}>
-                       <h3 className="text-xl font-bold text-slate-900 dark:text-light">Seção "Sobre"</h3>
-                        <div>
-                            <label htmlFor="about-headline" className={labelStyle}>Título (aceita HTML)</label>
-                            <input id="about-headline" type="text" value={content.about.headline} onChange={(e) => handleInputChange('about', 'headline', e.target.value)} className={inputStyle} />
-                        </div>
-                        <div>
-                            <label htmlFor="about-p1" className={labelStyle}>Primeiro Parágrafo</label>
-                            <textarea id="about-p1" rows={3} value={content.about.paragraph1} onChange={(e) => handleInputChange('about', 'paragraph1', e.target.value)} className={inputStyle}></textarea>
-                        </div>
-                        <div>
-                            <label htmlFor="about-p2" className={labelStyle}>Segundo Parágrafo</label>
-                            <textarea id="about-p2" rows={3} value={content.about.paragraph2} onChange={(e) => handleInputChange('about', 'paragraph2', e.target.value)} className={inputStyle}></textarea>
-                        </div>
-                        <div>
-                            <label htmlFor="about-button" className={labelStyle}>Texto do Botão</label>
-                            <input id="about-button" type="text" value={content.about.buttonText} onChange={(e) => handleInputChange('about', 'buttonText', e.target.value)} className={`${inputStyle} max-w-xs`} />
-                        </div>
-                        <div>
-                           <label htmlFor="about-image" className={labelStyle}>URL da Imagem</label>
-                           <div className="flex items-center gap-4">
-                              <div className="flex-grow">
-                                <input id="about-image" type="text" value={content.about.imageUrl} onChange={(e) => handleInputChange('about', 'imageUrl', e.target.value)} className={inputStyle} />
-                              </div>
-                              <ImagePreview src={content.about.imageUrl} />
-                              <input type="file" id="about-image-upload" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => handleInputChange('about', 'imageUrl', url), 'about-image')} />
-                              <button type="button" onClick={() => triggerFileUpload('about-image-upload')} disabled={uploading === 'about-image'} className={uploadButtonStyle}>
-                                  {uploading === 'about-image' ? 'Enviando...' : 'Upload'}
-                              </button>
-                           </div>
-                        </div>
-                    </div>
-                  </div>
-                );
-            case 'portfolio': return <AdminPortfolio portfolio={content.portfolio} portfolioErrors={errors.portfolio} uploading={uploading} saveBarProps={saveBarProps} handlePortfolioChange={handlePortfolioChange} handlePortfolioTechChange={handlePortfolioTechChange} addPortfolioItem={addPortfolioItem} addPortfolioTech={addPortfolioTech} removePortfolioTech={removePortfolioTech} handleDeletePortfolioItem={handleDeletePortfolioItem} handleMoveItemUp={(i) => handleMoveItem(i, 'up')} handleMoveItemDown={(i) => handleMoveItem(i, 'down')} triggerFileUpload={triggerFileUpload} handleTechIconUpload={handleTechIconUpload} handleImageUpload={handleImageUpload} handleBlur={() => {}} />;
+            case 'hero': return <AdminHero content={content.hero} handleInputChange={handleInputChange} saveBarProps={saveBarProps} />;
+            case 'about': return <AdminAbout content={content.about} setContent={setContent} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
+            case 'portfolio': return <AdminPortfolio portfolio={content.portfolio} portfolioErrors={errors.portfolio} uploading={uploading} saveBarProps={saveBarProps} handlePortfolioChange={handlePortfolioChange} handlePortfolioTechChange={handlePortfolioTechChange} addPortfolioItem={addPortfolioItem} addPortfolioTech={addPortfolioTech} removePortfolioTech={removePortfolioTech} handleDeletePortfolioItem={handleDeletePortfolioItem} handleMoveItemUp={(i) => handleMoveItem(i, 'up')} handleMoveItemDown={(i) => handleMoveItem(i, 'down')} triggerFileUpload={triggerFileUpload} handleTechIconUpload={(e, itemIndex, techIndex) => handleTechIconUpload(e, (svg) => handlePortfolioTechChange(itemIndex, techIndex, 'icon', svg))} handleImageUpload={handleImageUpload} handleBlur={() => {}} />;
+            case 'tecnologias': return <AdminTechCarousel content={content.tech_carousel} setContent={setContent} saveBarProps={saveBarProps} triggerFileUpload={triggerFileUpload} handleTechIconUpload={handleTechIconUpload} />;
             case 'appearance': return <AdminAppearance themeSettings={content.theme_settings} siteMeta={content.site_meta} setContent={setContent} setMessage={setMessage} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
             case 'profile':
                  return <AdminProfile session={session} profile={profile} supabase={supabase} onUpdate={fetchProfileAndLogs} />;

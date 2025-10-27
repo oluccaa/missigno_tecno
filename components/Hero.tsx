@@ -1,9 +1,25 @@
 import React from 'react';
 
-const Hero: React.FC = () => {
+interface HeroContent {
+    headline: string;
+    paragraph: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+}
+
+interface HeroProps {
+    content: HeroContent;
+}
+
+const Hero: React.FC<HeroProps> = ({ content }) => {
     const handleCTAClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         document.querySelector('#contato')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handlePortfolioClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        document.querySelector('#portfolio')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
@@ -27,15 +43,20 @@ const Hero: React.FC = () => {
 
             {/* Layer 4: Content */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <h1 data-aos="fade-up" className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 dark:text-light tracking-tighter mb-4">
-                    Desbloqueie o Potencial <br className="hidden md:block" /> Digital da Sua Marca<span className="text-accent">.</span>
-                </h1>
+                <h1 
+                  data-aos="fade-up" 
+                  className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 dark:text-light tracking-tighter mb-4"
+                  dangerouslySetInnerHTML={{ __html: content.headline }}
+                />
                 <p data-aos="fade-up" data-aos-delay="200" className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-500 dark:text-muted mb-8">
-                    Criamos experiências digitais autênticas que conectam, engajam e convertem. Da ideia ao lançamento, somos o parceiro que sua empresa precisa para decolar no mundo online.
+                    {content.paragraph}
                 </p>
-                <div data-aos="fade-up" data-aos-delay="400">
+                <div data-aos="fade-up" data-aos-delay="400" className="flex flex-col items-center gap-4">
                     <a href="#contato" onClick={handleCTAClick} className="inline-block bg-accent hover:bg-accent-hover text-white font-bold text-lg py-4 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/20">
-                        Vamos Conversar
+                        {content.ctaPrimary}
+                    </a>
+                    <a href="#portfolio" onClick={handlePortfolioClick} className="text-slate-500 dark:text-muted font-semibold hover:text-accent dark:hover:text-light transition-colors">
+                        {content.ctaSecondary}
                     </a>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Session } from '@supabase/supabase-js';
 
-type AdminTab = 'home' | 'header' | 'about' | 'portfolio' | 'appearance' | 'profile' | 'history';
+type AdminTab = 'home' | 'hero' | 'header' | 'about' | 'portfolio' | 'tecnologias' | 'appearance' | 'profile' | 'history';
 
 interface Profile {
   id: string;
@@ -91,9 +91,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, setActiveTab, se
           <div>
             <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Conteúdo</h3>
             <div className="space-y-1">
+              <NavLink label="Hero" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5V4H4zm0 10h5v5H4v-5zm10-10h5v5h-5V4zM14 14h5v5h-5v-5z" /></svg>} isActive={activeTab === 'hero'} onClick={() => handleNavClick('hero')} />
               <NavLink label="Cabeçalho e Rodapé" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 5h14M5 9h14M5 13h14M5 17h14" /></svg>} isActive={activeTab === 'header'} onClick={() => handleNavClick('header')} />
               <NavLink label="Sobre" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} isActive={activeTab === 'about'} onClick={() => handleNavClick('about')} />
               <NavLink label="Portfólio" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>} isActive={activeTab === 'portfolio'} onClick={() => handleNavClick('portfolio')} />
+              <NavLink label="Tecnologias" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>} isActive={activeTab === 'tecnologias'} onClick={() => handleNavClick('tecnologias')} />
             </div>
           </div>
           
