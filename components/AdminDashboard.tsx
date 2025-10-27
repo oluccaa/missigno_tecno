@@ -88,6 +88,7 @@ interface HeroContent {
     paragraph: string;
     ctaPrimary: string;
     ctaSecondary: string;
+    backgroundImageUrl: string;
 }
 
 
@@ -400,7 +401,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         switch (activeTab) {
             case 'home': return <AdminHome setActiveTab={setActiveTab} auditLogs={auditLogs} portfolio={content.portfolio} profile={profile} />;
             case 'header': return <AdminHeader content={content.header} handleInputChange={handleInputChange} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} headerErrors={errors.header} handleBlur={() => {}} saveBarProps={saveBarProps} />;
-            case 'hero': return <AdminHero content={content.hero} handleInputChange={handleInputChange} saveBarProps={saveBarProps} />;
+            case 'hero': return <AdminHero content={content.hero} handleInputChange={handleInputChange} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
             case 'about': return <AdminAbout content={content.about} setContent={setContent} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
             case 'portfolio': return <AdminPortfolio portfolio={content.portfolio} portfolioErrors={errors.portfolio} uploading={uploading} saveBarProps={saveBarProps} handlePortfolioChange={handlePortfolioChange} handlePortfolioTechChange={handlePortfolioTechChange} addPortfolioItem={addPortfolioItem} addPortfolioTech={addPortfolioTech} removePortfolioTech={removePortfolioTech} handleDeletePortfolioItem={handleDeletePortfolioItem} handleMoveItemUp={(i) => handleMoveItem(i, 'up')} handleMoveItemDown={(i) => handleMoveItem(i, 'down')} triggerFileUpload={triggerFileUpload} handleTechIconUpload={(e, itemIndex, techIndex) => handleTechIconUpload(e, (svg) => handlePortfolioTechChange(itemIndex, techIndex, 'icon', svg))} handleImageUpload={handleImageUpload} handleBlur={() => {}} />;
             case 'tecnologias': return <AdminTechCarousel content={content.tech_carousel} setContent={setContent} saveBarProps={saveBarProps} triggerFileUpload={triggerFileUpload} handleTechIconUpload={handleTechIconUpload} />;

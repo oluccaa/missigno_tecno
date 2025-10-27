@@ -5,6 +5,7 @@ interface HeroContent {
     paragraph: string;
     ctaPrimary: string;
     ctaSecondary: string;
+    backgroundImageUrl: string;
 }
 
 interface HeroProps {
@@ -26,7 +27,7 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
         <section id="inicio" className="relative text-center py-24 sm:py-32 lg:py-48 min-h-screen flex items-center justify-center overflow-hidden">
              {/* Layer 1: Background Image */}
              <img 
-                src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=1920&q=70&auto=format&fit=crop" 
+                src={content.backgroundImageUrl}
                 alt="Fundo tecnológico abstrato"
                 aria-hidden="true"
                 className="absolute inset-0 w-full h-full object-cover blur-sm"
