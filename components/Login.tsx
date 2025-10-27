@@ -11,8 +11,8 @@ type Props = {
 };
 
 const Login: React.FC<Props> = ({ theme, toggleTheme, supabase }) => {
-  const [email, setEmail] = useState("nathanlucca@missigno.com.br");
-  const [password, setPassword] = useState("Nathan@0@5&MISSIGn0");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
