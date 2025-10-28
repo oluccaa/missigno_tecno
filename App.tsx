@@ -1,21 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
+import { createClient, Session } from '@supabase/supabase-js';
 
 // Component imports
 import Header from './components/Header';
 import Hero from './components/Hero';
-import About from './components/About';
+import AboutPage from './components/About';
 import Services from './components/Services';
 import Portfolio from './components/Portfolio';
-import Process from './components/Process';
+import ProcessPage from './components/Process';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import Login from './components/Login';
-import AdminDashboard from './components/AdminDashboard';
 import BackToTopButton from './components/BackToTopButton';
 import WhatsAppButton from './components/WhatsAppButton';
-import SkeletonLoader from './components/SkeletonLoader'; // Importando o Skeleton Loader
-import TechCarousel from './components/TechCarousel'; // Importando o novo carrossel
+import TechCarousel from './components/TechCarousel';
+import Login from './components/Login';
+import AdminDashboard from './components/AdminDashboard';
+import SkeletonLoader from './components/SkeletonLoader';
+
+// Supabase client setup
+const supabaseUrl = 'https://hjjnjmzefmbbibrxdlsi.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqam5qbXplZm1iYmlicnhkbHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTUwNTYsImV4cCI6MjA3NzE5MTA1Nn0.o0ZRZUPStxS50fNGW9hukXTl4vo2GRrbv2XiP1X2p78';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // ==========================
 // Color Conversion Utilities
@@ -112,6 +117,20 @@ interface HeroContent {
     backgroundImageUrl: string;
 }
 
+interface ProcessStep {
+    title: string;
+    description: string;
+    icon: string; 
+    deliverables: string[];
+    tools: string[];
+}
+
+interface ProcessContent {
+    headline: string;
+    subheadline: string;
+    steps: ProcessStep[];
+}
+
 interface WebsiteContent {
   header: {
     logoType: 'text' | 'image';
@@ -122,6 +141,7 @@ interface WebsiteContent {
   };
   hero: HeroContent;
   about: AboutContent;
+  process: ProcessContent;
   portfolio: PortfolioItem[];
   tech_carousel: TechCarouselContent;
   site_meta: {
@@ -170,6 +190,40 @@ const defaultContent: WebsiteContent = {
             { imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop', name: 'Carla Dias', role: 'Designer UX/UI' },
         ]
     },
+    process: {
+        headline: "Da Ideia ao <span class=\"text-accent\">Impacto</span>.",
+        subheadline: "Nossa metodologia é um processo colaborativo e transparente, desenhado para transformar sua visão em uma realidade digital de sucesso.",
+        steps: [
+            {
+                title: "Imersão & Estratégia",
+                description: "Mergulhamos fundo no seu negócio para entender seus desafios, público e objetivos. Esta fase é a fundação de todo o projeto, onde alinhamos expectativas e traçamos o caminho para o sucesso digital.",
+                icon: "search",
+                deliverables: ["Briefing Aprofundado", "Análise de Mercado", "Definição de KPIs", "Roadmap do Projeto"],
+                tools: ["Miro", "Figma", "Google Analytics", "Notion"]
+            },
+            {
+                title: "Design & UX/UI",
+                description: "Com base na estratégia, criamos interfaces intuitivas e visualmente impactantes. Focamos em uma jornada de usuário que seja não apenas bonita, mas que também converta e encante.",
+                icon: "design",
+                deliverables: ["Wireframes e Fluxos", "Protótipos Interativos", "Design System", "Manual de Identidade Visual"],
+                tools: ["Figma", "Adobe XD", "Illustrator", "Maze"]
+            },
+            {
+                title: "Desenvolvimento",
+                description: "Nossos desenvolvedores transformam o design em código limpo, performático e escalável. Usamos as tecnologias mais modernas para garantir um produto robusto, seguro e preparado para o futuro.",
+                icon: "code",
+                deliverables: ["Front-end Responsivo", "Back-end Robusto", "Integração de APIs", "Código Versionado (Git)"],
+                tools: ["React", "TypeScript", "Node.js", "Supabase"]
+            },
+            {
+                title: "Lançamento & Otimização",
+                description: "Após testes rigorosos, lançamos o projeto. Mas nosso trabalho não para aqui. Monitoramos a performance, analisamos dados e propomos otimizações contínuas para garantir resultados crescentes.",
+                icon: "launch",
+                deliverables: ["Deploy em Produção", "Relatórios de Performance", "Plano de Melhorias", "Suporte Técnico"],
+                tools: ["Google Analytics", "Clarity", "Vercel", "Sentry"]
+            }
+        ]
+    },
     portfolio: [
         { 
           id: '1', 
@@ -185,37 +239,12 @@ const defaultContent: WebsiteContent = {
             { name: "PostgreSQL", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="currentColor" class="w-6 h-6 text-blue-800 dark:text-blue-400"><path fill="#336791" d="M24,42c-9.9,0-18-8.1-18-18S14.1,6,24,6s18,8.1,18,18S33.9,42,24,42z"/><path fill="#fff" d="M25.7,34.2h-3.9V21.1h-3.8v-3.3h11.5v3.3h-3.8V34.2z M27,16.5c0-1.2-0.9-2-2.3-2s-2.3,0.9-2.3,2 c0,1.2,0.9,2,2.3,2S27,17.7,27,16.5z"/></svg>`}
           ]
         },
-        { 
-          id: '2', 
-          imageurl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop", 
-          title: "E-commerce de Alta Conversão", 
-          category: "Loja Virtual",
-          technologies: [
-            { name: "Tailwind CSS", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-cyan-500"><path d="M12.001,4.529c-0.45,0-0.886,0.179-1.207,0.488L9.92,5.884C9.39,5.354,8.736,5.001,8,5 c-1.222,0-2.27,0.706-2.787,1.748L4,7.462C4,7.462,4,4.529,4,4.529s0-1.748,0-1.748c0-0.276-0.224-0.5-0.5-0.5S3,2.505,3,2.781 v18.438C3,21.495,3.224,21.719,3.5,21.719S4,21.495,4,21.219V11.569c0.396-0.784,1.239-1.32,2.188-1.32c0.45,0,0.886,0.179,1.207,0.488 l0.874,0.868c0.531-0.53,1.184-0.879,1.943-0.879c1.222,0,2.27,0.706,2.787,1.748L14,13.228c0,0,0-2.933,0-2.933s0-1.748,0-1.748 c0-0.276-0.224-0.5-0.5-0.5s-0.5,0.224-0.5,0.5v10.688c-0.396,0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207-0.488 l-0.874-0.868c-0.531,0.53-1.184-0.879-1.943,0.879c-1.222,0-2.27-0.706-2.787-1.748L7,19.228V8.538c0.396,0.784,1.239,1.32,2.188,1.32 c0.45,0,0.886,0.179,1.207,0.488l0.874,0.868c0.531-0.53,1.184-0.879,1.943-0.879c1.222,0,2.27,0.706,2.787,1.748L17,13.228 v-2.933c-0.396-0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207-0.488l-0.874-0.868 c-0.531-0.53-1.184-0.879-1.943-0.879c-1.222,0-2.27-0.706-2.787-1.748L7,5.744V4.529c0-0.276,0.224-0.5,0.5-0.5 c0.276,0,0.5,0.224,0.5,0.5v1.214c0.396,0.784,1.239,1.32,2.188,1.32c0.45,0,0.886,0.179,1.207-0.488l0.874-0.868 c-0.531-0.53-1.184-0.879-1.943-0.879c-0.759,0-1.412,0.353-1.943,0.879L6.08,5.884C5.759,5.595,5.323,5.416,4.873,5.416 c-1.222,0-2.27,0.706-2.787,1.748L1,7.88v12.338C1,20.495,1.224,20.719,1.5,20.719S2,20.495,2,20.219V7.88 C2,7.88,2,4.947,2,4.947s0-1.748,0-1.748c0-0.276,0.224-0.5,0.5-0.5S3,2.923,3,3.199v1.33c0.396-0.784,1.239-1.32,2.188-1.32 c0.45,0,0.886,0.179,1.207,0.488l0.874,0.868c0.531-0.53,1.184-0.879,1.943-0.879C10.158,4.529,11.088,5.135,12.001,4.529z M21,3.199c0,0.276-0.224,0.5-0.5,0.5S20,3.475,20,3.199V2.781c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5V3.199z M19,4.947v1.214 c-0.396-0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207,0.488l-0.874-0.868C14.199,3.923,13.546,3.574,12.8,3.574 c-1.222,0-2.27,0.706-2.787,1.748L9,6.038v10.688c0.396,0.784,1.239,1.32,2.188,1.32c0.45,0,0.886,0.179,1.207,0.488l0.874,0.868 c0.531-0.53,1.184-0.879,1.943-0.879c1.222,0,2.27,0.706,2.787,1.748l1.126-0.716V4.947z M20,11.569v8.65 c-0.396-0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207,0.488l-0.874-0.868c-0.531,0.53-1.184-0.879-1.943,0.879 c-1.222,0-2.27-0.706-2.787-1.748l-1.126,0.716V11.569c0.396-0.784,1.239-1.32,2.188-1.32c0.45,0,0.886,0.179,1.207,0.488 l0.874,0.868c0.531,0.53,1.184-0.879,1.943,0.879c1.222,0,2.27,0.706,2.787,1.748L20,13.228V11.569z M20,20.219 c0-0.276-0.224-0.5-0.5-0.5s-0.5,0.224-0.5,0.5v1.001c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5V20.219z"/></svg>`},
-            { name: "Supabase", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-green-500"><path d="M22.512 10.45a.5.5 0 00-.433-.25H18.75V5.564a.5.5 0 00-.734-.442l-9.25 5.25a.5.5 0 000 .85l9.25 5.25a.5.5 0 00.734-.442V13.7h3.329a.5.5 0 00.433-.75l-2.75-5.25zM17.25 12.2h-3.375v4.29L5.438 12 13.875 7.42v4.28h3.375l2.188 4.16-2.188-3.66zM1.5 21.75a.75.75 0 00.75.75h9a.75.75 0 000-1.5H3v-18h7.5a.75.75 0 000-1.5H2.25a.75.75 0 00-.75.75v19.5z"/></svg>`}
-          ]
-        },
-        { id: '3', imageurl: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2070&auto=format&fit=crop", title: "Sistema de Agendamento Online", category: "Desenvolvimento Web" },
-        { id: '4', imageurl: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=2070&auto=format&fit=crop", title: "Website para Startup de IA", category: "Web Design & Branding" },
-        { id: '5', imageurl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop", title: "Portal Imobiliário Inteligente", category: "Aplicação Web" },
-        { id: '6', imageurl: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1974&auto=format&fit=crop", title: "Plataforma de Cursos EAD", category: "Desenvolvimento Web" },
-        { id: '7', imageurl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop", title: "Dashboard de Business Intelligence", category: "Data-Viz" },
-        { id: '8', imageurl: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=2231&auto=format&fit=crop", title: "Aplicativo de Delivery", category: "Mobile App" },
-        { id: '9', imageurl: "https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=2070&auto=format&fit=crop", title: "CRM para Vendas", category: "Sistema Web" }
     ],
     tech_carousel: {
         headline: "Nossas Ferramentas de <span class=\"text-accent\">Trabalho</span>",
         subheadline: "Utilizamos as tecnologias mais modernas e robustas do mercado para construir soluções de ponta.",
         technologies: [
             { name: 'React', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11.5 -10.23174 23 20.46348"><title>React Logo</title><circle cx="0" cy="0" r="2.05" fill="#61DAFB"/><g stroke="#61DAFB" stroke-width="1" fill="none"><ellipse rx="11" ry="4.2"/><ellipse rx="11" ry="4.2" transform="rotate(60)"/><ellipse rx="11" ry="4.2" transform="rotate(120)"/></g></svg>` },
-            { name: 'Tailwind CSS', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#38B2AC"><path d="M12.001,4.529c-0.45,0-0.886,0.179-1.207,0.488L9.92,5.884C9.39,5.354,8.736,5.001,8,5 c-1.222,0-2.27,0.706-2.787,1.748L4,7.462C4,7.462,4,4.529,4,4.529s0-1.748,0-1.748c0-0.276-0.224-0.5-0.5-0.5S3,2.505,3,2.781 v18.438C3,21.495,3.224,21.719,3.5,21.719S4,21.495,4,21.219V11.569c0.396-0.784,1.239-1.32,2.188-1.32c0.45,0,0.886,0.179,1.207,0.488 l0.874,0.868c0.531-0.53,1.184-0.879,1.943-0.879c1.222,0,2.27,0.706,2.787,1.748L14,13.228c0,0,0-2.933,0-2.933s0-1.748,0-1.748 c0-0.276-0.224-0.5-0.5-0.5s-0.5,0.224-0.5,0.5v10.688c-0.396,0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207-0.488 l-0.874-0.868c-0.531,0.53-1.184-0.879-1.943,0.879c-1.222,0-2.27-0.706-2.787-1.748L7,19.228V8.538c0.396,0.784,1.239,1.32,2.188,1.32 c0.45,0,0.886,0.179,1.207,0.488l0.874,0.868c0.531-0.53,1.184-0.879,1.943-0.879c1.222,0,2.27,0.706,2.787,1.748L17,13.228 v-2.933c-0.396-0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207-0.488l-0.874-0.868 c-0.531-0.53-1.184-0.879-1.943-0.879c-1.222,0-2.27-0.706-2.787-1.748L7,5.744V4.529c0-0.276,0.224-0.5,0.5-0.5 c0.276,0,0.5,0.224,0.5,0.5v1.214c0.396,0.784,1.239,1.32,2.188,1.32c0.45,0,0.886,0.179,1.207-0.488l0.874-0.868 c-0.531-0.53-1.184-0.879-1.943-0.879c-0.759,0-1.412,0.353-1.943,0.879L6.08,5.884C5.759,5.595,5.323,5.416,4.873,5.416 c-1.222,0-2.27,0.706-2.787,1.748L1,7.88v12.338C1,20.495,1.224,20.719,1.5,20.719S2,20.495,2,20.219V7.88 C2,7.88,2,4.947,2,4.947s0-1.748,0-1.748c0-0.276,0.224-0.5,0.5-0.5S3,2.923,3,3.199v1.33c0.396-0.784,1.239-1.32,2.188-1.32 c0.45,0,0.886,0.179,1.207,0.488l0.874,0.868c0.531-0.53,1.184-0.879,1.943-0.879C10.158,4.529,11.088,5.135,12.001,4.529z M21,3.199c0,0.276-0.224,0.5-0.5,0.5S20,3.475,20,3.199V2.781c0-0.276,0.224-0.5,0.5-0.5s0.5,0.224,0.5,0.5V3.199z M19,4.947v1.214 c-0.396-0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207,0.488l-0.874-0.868C14.199,3.923,13.546,3.574,12.8,3.574 c-1.222,0-2.27,0.706-2.787,1.748L9,6.038v10.688c0.396,0.784,1.239,1.32,2.188,1.32c0.45,0,0.886,0.179,1.207,0.488l0.874,0.868 c0.531-0.53,1.184-0.879,1.943-0.879c1.222,0,2.27,0.706,2.787,1.748l1.126-0.716V4.947z M20,11.569v8.65 c-0.396-0.784-1.239-1.32-2.188-1.32c-0.45,0-0.886,0.179-1.207,0.488l-0.874-0.868c-0.531,0.53-1.184-0.879-1.943,0.879 c-1.222,0-2.27-0.706-2.787-1.748l-1.126,0.716V11.569c0.396-0.784,1.239-1.32,2.188-1.32c0.45,0,0.886,0.179,1.207,0.488 l0.874,0.868c0.531,0.53,1.184-0.879,1.943,0.879c1.222,0,2.27,0.706,2.787,1.748L20,13.228V11.569z M20,20.219 c0-0.276-0.224-0.5-0.5-0.5s-0.5,0.224-0.5,0.5v1.001c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5V20.219z"/></svg>` },
-            { name: 'TypeScript', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#3178C6"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11.6,18.5H9.3V10.3H11.6V18.5M17.4,12.5C17.4,14.1 16.5,15.1 15.2,15.1C14,15.1 13.3,14.3 13.1,13.5L14.1,13.1C14.2,13.6 14.6,14.1 15.1,14.1C15.8,14.1 16.3,13.6 16.3,12.6V10.2H15.2V9.1H16.3V8C16.3,7.3 16.7,6.8 17.4,6.8V7.8C17.1,7.8 16.8,8 16.8,8.4L16.9,9.1H18V10.2H16.9V12.2C16.9,12.4 17.1,12.5 17.4,12.5Z" /></svg>` },
-            { name: 'JavaScript', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#F7DF1E"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h-2V9h2v7zm4 0h-2V9h2v7z"/></svg>` },
-            { name: 'HTML5', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#E34F26"><path d="M12 2L3 4.5l1.5 15L12 22l7.5-2.5 1.5-15zM12 19.5l-5.25-1.75L7.5 7.5h9l-.75 8.25L12 19.5z"/></svg>` },
-            { name: 'CSS3', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1572B6"><path d="M12 2L3 4.5l1.5 15L12 22l7.5-2.5 1.5-15zM12 19.5l-5.25-1.75L7.5 7.5h9l-.75 8.25L12 19.5z"/></svg>` },
-            { name: 'Supabase', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#3ECF8E"><path d="M22.512 10.45a.5.5 0 00-.433-.25H18.75V5.564a.5.5 0 00-.734-.442l-9.25 5.25a.5.5 0 000 .85l9.25 5.25a.5.5 0 00.734-.442V13.7h3.329a.5.5 0 00.433-.75l-2.75-5.25zM17.25 12.2h-3.375v4.29L5.438 12 13.875 7.42v4.28h3.375l2.188 4.16-2.188-3.66zM1.5 21.75a.75.75 0 00.75.75h9a.75.75 0 000-1.5H3v-18h7.5a.75.75 0 000-1.5H2.25a.75.75 0 00-.75.75v19.5z"/></svg>` },
-            { name: 'Node.js', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#339933"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.07 15.29l-1.41-1.41L11.59 14H6v-2h5.59l-2.07-2.07 1.41-1.41L15.41 12l-4.48 3.29z"/></svg>`},
-            { name: 'Vite', icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="#646CFF" d="M12 2l-8 11h5l-1 8 10-12h-6l2-7z"/><path fill="#FFC107" d="M18 2l-9 12h5l-1 8 7-9h-4l2-11z"/></svg>`},
         ]
     },
     site_meta: {
@@ -232,11 +261,6 @@ const defaultContent: WebsiteContent = {
         muted: '#94a3b8',
     }
 };
-
-// Supabase setup
-const supabaseUrl = 'https://vvonilfxdxzgydrqjser.supabase.co';
-const supabaseKey = 'sb_publishable_PT_t-om6yeIs-MFPa9mDqA_SlrDWviy';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Helper function to determine the initial theme based on user preference and system settings.
 const getInitialTheme = (): 'light' | 'dark' => {
@@ -263,79 +287,83 @@ const App: React.FC = () => {
     const fetchContent = useCallback(async () => {
         setLoading(true);
         try {
-            // Fetch sections
-            const { data: sectionsData, error: sectionsError } = await supabase
-                .from('sections')
-                .select('id, content');
-            
-            if (sectionsError) throw sectionsError;
+            const { data: sectionsData, error: sectionsError } = await supabase.from('sections').select('id, content');
+            const { data: portfolioData, error: portfolioError } = await supabase.from('portfolio').select('*').order('position', { ascending: true });
 
-            // Fetch portfolio items ordered by position
-            const { data: portfolioData, error: portfolioError } = await supabase
-                .from('portfolio')
-                .select('*')
-                .order('position', { ascending: true });
+            if (sectionsError || portfolioError) {
+                throw sectionsError || portfolioError;
+            }
+            
+            if (!sectionsData || sectionsData.length === 0) {
+                 console.warn("Nenhuma seção encontrada no banco de dados. Usando conteúdo padrão.");
+                 setContent(defaultContent);
+                 return;
+            }
 
-            if (portfolioError) throw portfolioError;
+            const sections = sectionsData.reduce((acc, section) => {
+                acc[section.id] = section.content;
+                return acc;
+            }, {} as { [key: string]: any });
             
-            const fetchedContent: Partial<WebsiteContent> = {};
-
-            sectionsData.forEach(section => {
-              if (section.id && section.content) {
-                  (fetchedContent as any)[section.id] = typeof section.content === 'string' 
-                    ? JSON.parse(section.content) 
-                    : section.content;
-              }
-            });
-            
-            fetchedContent.portfolio = portfolioData || defaultContent.portfolio;
-            
-            // Merge with default to ensure all keys are present
-            const finalContent = {
-                header: { ...defaultContent.header, ...fetchedContent.header },
-                hero: { ...defaultContent.hero, ...fetchedContent.hero },
-                about: { ...defaultContent.about, ...fetchedContent.about },
-                portfolio: fetchedContent.portfolio.length > 0 ? fetchedContent.portfolio : defaultContent.portfolio,
-                tech_carousel: { ...defaultContent.tech_carousel, ...fetchedContent.tech_carousel },
-                site_meta: { ...defaultContent.site_meta, ...fetchedContent.site_meta },
-                theme_settings: { ...defaultContent.theme_settings, ...fetchedContent.theme_settings },
+            const fetchedContent: WebsiteContent = {
+                header: sections.header || defaultContent.header,
+                hero: sections.hero || defaultContent.hero,
+                about: sections.about || defaultContent.about,
+                process: sections.process || defaultContent.process,
+                portfolio: portfolioData || defaultContent.portfolio,
+                tech_carousel: sections.tech_carousel || defaultContent.tech_carousel,
+                site_meta: sections.site_meta || defaultContent.site_meta,
+                theme_settings: sections.theme_settings || defaultContent.theme_settings,
             };
-
-            setContent(finalContent as WebsiteContent);
-        } catch (error: any) {
-            console.error("Error fetching content:", error.message);
-            setContent(defaultContent);
+            
+            setContent(fetchedContent);
+        } catch (error) {
+            console.error("Erro ao buscar conteúdo:", error);
+            setContent(defaultContent); // Fallback to default content on error
         } finally {
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        fetchContent();
-    }, [fetchContent]);
+        const handleHashChange = () => setHash(window.location.hash);
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
 
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
-            // If user logs out, redirect to home
+        }).finally(() => {
+             fetchContent();
+        });
+
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
             if (_event === 'SIGNED_OUT') {
                 window.location.hash = '';
             }
         });
-        
-        // Initial session check
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session)
-        });
-
-        const handleHashChange = () => setHash(window.location.hash);
-        window.addEventListener('hashchange', handleHashChange);
 
         return () => {
-            subscription.unsubscribe();
-            window.removeEventListener('hashchange', handleHashChange);
+            authListener?.subscription.unsubscribe();
         };
-    }, []);
+    }, [fetchContent]);
+
+    useEffect(() => {
+        if (hash === '' || hash === '#inicio') {
+            const scrollToTarget = sessionStorage.getItem('scrollTo');
+            if (scrollToTarget) {
+                sessionStorage.removeItem('scrollTo');
+                setTimeout(() => {
+                    const element = document.querySelector(scrollToTarget);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
+            }
+        }
+    }, [hash]);
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -346,7 +374,6 @@ const App: React.FC = () => {
         localStorage.setItem('theme', theme);
     }, [theme]);
     
-    // Apply theme colors from DB
     useEffect(() => {
         if (content?.theme_settings) {
             const settings = content.theme_settings;
@@ -369,7 +396,6 @@ const App: React.FC = () => {
         }
     }, [content?.theme_settings]);
 
-    // Update Favicons
     useEffect(() => {
         if (content?.site_meta) {
             const { faviconIcoUrl, faviconSvgUrl, appleTouchIconUrl } = content.site_meta;
@@ -383,39 +409,47 @@ const App: React.FC = () => {
         setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
     };
 
+    if (hash === '#login') {
+        return <Login theme={theme} toggleTheme={toggleTheme} supabase={supabase} />;
+    }
+
+    if (hash === '#admin') {
+        if (loading) return <SkeletonLoader />;
+        if (!session) {
+            window.location.hash = '#login';
+            return <SkeletonLoader />;
+        }
+        if (!content) return <SkeletonLoader />;
+        return <AdminDashboard theme={theme} toggleTheme={toggleTheme} supabase={supabase} initialContent={content} onSaveSuccess={fetchContent} session={session} />;
+    }
+
     if (loading || !content) {
         return <SkeletonLoader />;
     }
-
-    if (hash === '#login' && !session) {
-      return <Login theme={theme} toggleTheme={toggleTheme} supabase={supabase} />;
-    }
-
-    if (session && (hash === '#admin' || hash === '')) {
-      return (
-        <AdminDashboard
-          theme={theme}
-          toggleTheme={toggleTheme}
-          supabase={supabase}
-          initialContent={content}
-          onSaveSuccess={fetchContent}
-          session={session}
-        />
-      );
-    }
+    
+    const renderMainContent = () => {
+        switch (hash) {
+            case '#sobre-nos':
+                return <AboutPage content={content.about} />;
+            case '#processo':
+                return <ProcessPage content={content.process} />;
+            default:
+                return (
+                    <>
+                        <Hero content={content.hero} />
+                        <Services />
+                        <TechCarousel content={content.tech_carousel} />
+                        <Portfolio items={content.portfolio} />
+                        <Contact />
+                    </>
+                );
+        }
+    };
     
     return (
         <div id="inicio" className="bg-white dark:bg-primary transition-colors duration-300">
             <Header theme={theme} toggleTheme={toggleTheme} content={content.header} />
-            <main>
-                <Hero content={content.hero} />
-                <About content={content.about} />
-                <Services />
-                <TechCarousel content={content.tech_carousel} />
-                <Portfolio items={content.portfolio} />
-                <Process />
-                <Contact />
-            </main>
+            <main>{renderMainContent()}</main>
             <Footer theme={theme} content={content.header} />
             <div className="fixed bottom-6 right-6 flex flex-col items-center gap-4 z-40">
                 <WhatsAppButton />

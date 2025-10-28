@@ -69,6 +69,7 @@
             'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
             'aurora': 'aurora 20s ease-in-out infinite',
             'scroll': 'scroll 40s linear infinite',
+            'spotlight': 'spotlight 10s ease-in-out infinite',
           },
           keyframes: {
             'gradient-bg': {
@@ -87,7 +88,12 @@
             'scroll': {
               'from': { transform: 'translateX(0)' },
               'to': { transform: 'translateX(-50%)' },
-            }
+            },
+            'spotlight': {
+              '0%': { backgroundPosition: '20% 50%', backgroundSize: '300% 300%' },
+              '50%': { backgroundPosition: '80% 50%', backgroundSize: '350% 350%' },
+              '100%': { backgroundPosition: '20% 50%', backgroundSize: '300% 300%' },
+            },
           }
         }
       }
@@ -105,7 +111,7 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.76.1"
   }
 }
 </script>

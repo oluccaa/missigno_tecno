@@ -12,6 +12,7 @@ import ImagePreview from './ImagePreview';
 import AdminTechCarousel from './AdminTechCarousel';
 import AdminHero from './AdminHero';
 import AdminAbout from './AdminAbout';
+import AdminProcess from './AdminProcess'; // Importando a nova tela de processo
 
 // ==========================
 // Tipos
@@ -91,11 +92,26 @@ interface HeroContent {
     backgroundImageUrl: string;
 }
 
+interface ProcessStep {
+    title: string;
+    description: string;
+    icon: string; 
+    deliverables: string[];
+    tools: string[];
+}
+
+interface ProcessContent {
+    headline: string;
+    subheadline: string;
+    steps: ProcessStep[];
+}
+
 
 interface WebsiteContent {
   header: HeaderContent;
   hero: HeroContent;
   about: AboutContent;
+  process: ProcessContent;
   portfolio: PortfolioItem[];
   tech_carousel: TechCarouselContent;
   site_meta: {
@@ -132,7 +148,7 @@ interface AdminDashboardProps {
   session: Session | null;
 }
 
-type AdminTab = 'home' | 'hero' | 'header' | 'about' | 'portfolio' | 'tecnologias' | 'appearance' | 'profile' | 'history';
+type AdminTab = 'home' | 'hero' | 'header' | 'about' | 'process' | 'portfolio' | 'tecnologias' | 'appearance' | 'profile' | 'history';
 
 type ErrorMap = { [key: string]: string };
 
@@ -344,8 +360,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         try {
             const updates = [];
             
-            // Sections update (header, about, site_meta, theme_settings, tech_carousel)
-            const changedSections = (['header', 'hero', 'about', 'tech_carousel', 'site_meta', 'theme_settings'] as const)
+            // Sections update
+            const changedSections = (['header', 'hero', 'about', 'process', 'tech_carousel', 'site_meta', 'theme_settings'] as const)
                 .filter(key => JSON.stringify(content[key]) !== JSON.stringify(originalContent[key]));
 
             for (const sectionId of changedSections) {
@@ -374,14 +390,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             // Audit Log
             const changes = diff(originalContent, content);
             for (const change of changes) {
+                // RLS policy likely requires the user's ID to be present on insert.
+                if (!session?.user?.id) {
+                    console.error("Audit trail failed: User is not properly authenticated.");
+                    continue;
+                }
                 const { error: logError } = await supabase.from('audit_logs').insert({
+                    user_id: session.user.id,
                     user_email: session?.user?.email || 'unknown',
                     action: 'UPDATE',
                     description: `Campo '${change.path}' foi atualizado.`,
                     old_value: change.old_value,
                     new_value: change.new_value
                 });
-                if (logError) console.error("Error logging audit trail:", logError);
+                if (logError) console.error("Error logging audit trail:", logError.message);
             }
 
             setMessage({ type: 'success', text: 'Alterações salvas com sucesso!' });
@@ -403,6 +425,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             case 'header': return <AdminHeader content={content.header} handleInputChange={handleInputChange} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} headerErrors={errors.header} handleBlur={() => {}} saveBarProps={saveBarProps} />;
             case 'hero': return <AdminHero content={content.hero} handleInputChange={handleInputChange} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
             case 'about': return <AdminAbout content={content.about} setContent={setContent} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;
+            case 'process': return <AdminProcess content={content.process} setContent={setContent} saveBarProps={saveBarProps} />;
             case 'portfolio': return <AdminPortfolio portfolio={content.portfolio} portfolioErrors={errors.portfolio} uploading={uploading} saveBarProps={saveBarProps} handlePortfolioChange={handlePortfolioChange} handlePortfolioTechChange={handlePortfolioTechChange} addPortfolioItem={addPortfolioItem} addPortfolioTech={addPortfolioTech} removePortfolioTech={removePortfolioTech} handleDeletePortfolioItem={handleDeletePortfolioItem} handleMoveItemUp={(i) => handleMoveItem(i, 'up')} handleMoveItemDown={(i) => handleMoveItem(i, 'down')} triggerFileUpload={triggerFileUpload} handleTechIconUpload={(e, itemIndex, techIndex) => handleTechIconUpload(e, (svg) => handlePortfolioTechChange(itemIndex, techIndex, 'icon', svg))} handleImageUpload={handleImageUpload} handleBlur={() => {}} />;
             case 'tecnologias': return <AdminTechCarousel content={content.tech_carousel} setContent={setContent} saveBarProps={saveBarProps} triggerFileUpload={triggerFileUpload} handleTechIconUpload={handleTechIconUpload} />;
             case 'appearance': return <AdminAppearance themeSettings={content.theme_settings} siteMeta={content.site_meta} setContent={setContent} setMessage={setMessage} saveBarProps={saveBarProps} handleImageUpload={handleImageUpload} triggerFileUpload={triggerFileUpload} uploading={uploading} />;

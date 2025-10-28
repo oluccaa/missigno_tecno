@@ -31,8 +31,10 @@ interface AboutContent {
 
 interface WebsiteContent {
   header: any;
+  hero: any;
   about: AboutContent;
   portfolio: any[];
+  tech_carousel: any;
   site_meta: any;
   theme_settings: any;
 }

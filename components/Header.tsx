@@ -1,13 +1,39 @@
 import React, { useState } from 'react';
 import ThemeToggleButton from './ThemeToggleButton';
 
-const NavLink: React.FC<{ href: string; children: React.ReactNode; onClick?: () => void; }> = ({ href, children, onClick }) => {
+const NavLink: React.FC<{ href: string; children: React.ReactNode; isPageLink?: boolean; onClick?: () => void; }> = ({ href, children, isPageLink, onClick }) => {
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-        const element = document.querySelector(href);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+
+        // Special handling for the home link to ensure it always navigates home first.
+        if (href === '#inicio') {
+            window.location.hash = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (onClick) onClick();
+            return;
         }
+        
+        if (isPageLink) {
+            window.location.hash = href;
+            window.scrollTo(0, 0); // Scroll to top for the new "page"
+        } else {
+            // Anchor link to a section on the main page
+            const isHomePage = !window.location.hash || window.location.hash === '#inicio';
+            
+            if (isHomePage) {
+                // We are on the home page, just scroll smoothly
+                const element = document.querySelector(href);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                // We are on a different page, need to navigate home first.
+                // Store the target hash to scroll to after navigation.
+                sessionStorage.setItem('scrollTo', href);
+                window.location.hash = ''; // Go to home page
+            }
+        }
+
         if (onClick) {
             onClick();
         }
@@ -18,6 +44,7 @@ const NavLink: React.FC<{ href: string; children: React.ReactNode; onClick?: () 
         </a>
     );
 };
+
 
 interface HeaderProps {
     theme: string;
@@ -66,11 +93,11 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, content }) => {
     const closeMenu = () => setIsMenuOpen(false);
 
     const navLinks = [
-        { href: '#sobre', label: 'Sobre' },
+        { href: '#inicio', label: 'Início' },
+        { href: '#sobre-nos', label: 'Sobre', isPageLink: true },
         { href: '#solucoes', label: 'Soluções' },
-        { href: '#tecnologias', label: 'Tecnologias' },
         { href: '#portfolio', label: 'Portfolio' },
-        { href: '#processo', label: 'Processo' },
+        { href: '#processo', label: 'Processo', isPageLink: true },
     ];
 
     const logoSrc = theme === 'dark' 
@@ -84,7 +111,7 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, content }) => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
-                    <a href="#inicio" onClick={(e) => { e.preventDefault(); document.querySelector('#inicio')?.scrollIntoView({ behavior: 'smooth' }); }} className="flex items-center">
+                    <a href="#inicio" onClick={(e) => { e.preventDefault(); window.location.hash = ''; window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center">
                         {content.logoType === 'image' && optimizedLogoSrc ? (
                             <img src={optimizedLogoSrc} alt="Logo da Agência Digital MissigNo" className="h-12 w-auto" />
                         ) : (
@@ -97,7 +124,7 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, content }) => {
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-8">
                         {navLinks.map(link => (
-                            <NavLink key={link.href} href={link.href}>{link.label}</NavLink>
+                            <NavLink key={link.href} href={link.href} isPageLink={!!link.isPageLink}>{link.label}</NavLink>
                         ))}
                     </nav>
                      <div className="hidden md:flex items-center space-x-4">
@@ -130,7 +157,7 @@ const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, content }) => {
                 <div id="mobile-menu" className="md:hidden bg-white dark:bg-secondary border-t border-slate-200 dark:border-slate-700">
                     <nav className="flex flex-col items-center space-y-4 px-4 py-6">
                         {navLinks.map(link => (
-                            <NavLink key={link.href} href={link.href} onClick={closeMenu}>{link.label}</NavLink>
+                            <NavLink key={link.href} href={link.href} isPageLink={!!link.isPageLink} onClick={closeMenu}>{link.label}</NavLink>
                         ))}
                         <a href="#contato" onClick={(e) => { e.preventDefault(); document.querySelector('#contato')?.scrollIntoView({ behavior: 'smooth' }); closeMenu(); }} className="w-full text-center bg-accent hover:bg-accent-hover text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300">
                            {content.contactButton}

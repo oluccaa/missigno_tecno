@@ -40,10 +40,6 @@ const optimizeImageUrl = (url: string | undefined, options: { width: number; qua
 
 
 const Footer: React.FC<FooterProps> = ({ theme, content }) => {
-  const handleLoginClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    window.location.hash = "#login";
-  };
 
   const logoSrc = theme === 'dark' 
     ? content.logoImageUrlDark || content.logoImageUrlLight 
@@ -60,12 +56,8 @@ const Footer: React.FC<FooterProps> = ({ theme, content }) => {
               &copy; {new Date().getFullYear()} MissigNo. Todos os direitos reservados.
             </p>
             <span className="hidden sm:inline">|</span>
-            <a
-              href="#login"
-              onClick={handleLoginClick}
-              className="hover:text-accent dark:hover:text-accent-hover transition-colors duration-300"
-            >
-              Acesso Restrito
+            <a href="#login" className="hover:text-accent transition-colors duration-200" onClick={(e) => { e.preventDefault(); window.location.hash = '#login'; }}>
+                Acesso Restrito
             </a>
           </div>
           <div className="order-first md:order-last">
